@@ -1,8 +1,13 @@
 package editor;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.io.*;
 
 public class TextEditor extends JFrame {
+    private JTextField textField;
+    private JTextArea textArea;
+
 
     public TextEditor() {
         // Configure the frame first
@@ -12,27 +17,38 @@ public class TextEditor extends JFrame {
 
 
         // Create JTextArea component
-        JTextArea textArea = new JTextArea();
+        textArea = new JTextArea();
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setFont(new Font("DejaVu Sans Mono", Font.PLAIN, 14));
         textArea.setName("TextArea");
 
         //create a textfield
-        JTextField textField=new JTextField(20);
-        textField.setText("Enter file name...");
+        textField=new JTextField(20);
+        textField.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+        textField.setName("FileNameField");
 
         //create two buttons
+        JButton loadButton=new JButton("Load");
+        loadButton.setToolTipText("Load the file");
+        loadButton.setName("LoadButton");
+        loadButton.addActionListener(event->loadFile());
+
+
+
+
+
+
         JButton saveButton=new JButton("Save");
+        saveButton.setToolTipText("Save the file");
         saveButton.setName("SaveButton");
-        JButton editButton=new JButton("Edit");
-        editButton.setName("EditButton");
+        saveButton.addActionListener(event->saveFile());
 
         //add a panel which will contain a text field and two buttons,load and save
         JPanel panel=new JPanel();
         panel.add(textField);
+        panel.add(loadButton);
         panel.add(saveButton);
-        panel.add(editButton);
 
         //add panel to frame
         getContentPane().add(BorderLayout.NORTH,panel);
@@ -48,6 +64,70 @@ public class TextEditor extends JFrame {
         // Make the window visible
         setVisible(true);
     }
+
+    private void loadFile()
+    {
+
+        String fileName=textField.getText();
+        if(fileName.isBlank()) //if input is whitespace or no input
+            return;
+        File file=new File(fileName);
+        try(BufferedReader reader=new BufferedReader(new FileReader(file)))
+        {
+            String line;
+            StringBuffer content=new StringBuffer();
+
+            while((line= reader.readLine())!=null)
+            {
+                content.append(line).append("\n");
+
+            }
+            textArea.setText(content.toString());
+
+        }
+        catch(FileNotFoundException e)
+        {
+            JOptionPane.showMessageDialog(null,"File "+fileName+" not found");
+
+        }
+        catch(IOException e)
+        {
+            JOptionPane.showMessageDialog(null,"Error reading file "+fileName);
+
+        }
+
+
+
+    }
+
+
+    private void saveFile()
+    {
+        String fileName=textField.getText();
+        if(fileName.isBlank())
+            return;
+        File file=new File(fileName);
+        try(BufferedWriter writer=new BufferedWriter(new FileWriter(fileName)))
+        {
+            writer.write(textArea.getText());
+
+        }
+        catch(IOException e)
+        {
+            JOptionPane.showMessageDialog(null,"Error saving the file "+fileName);
+
+
+        }
+
+
+
+
+
+
+    }
+
+
+
 
 
 }
