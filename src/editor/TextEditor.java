@@ -74,19 +74,12 @@ public class TextEditor extends JFrame {
         File file=new File(fileName);
         try(BufferedReader reader=new BufferedReader(new FileReader(file)))
         {
-            String line;
-            StringBuffer content=new StringBuffer();
-
-            while((line= reader.readLine())!=null)
-            {
-                content.append(line).append("\n");
-
-            }
-            textArea.setText(content.toString());
+            textArea.read(reader,null);//handles newline issue while manual reading
 
         }
         catch(FileNotFoundException e)
         {
+            textArea.setText("");//make text area empty when file is not found
             JOptionPane.showMessageDialog(null,"File "+fileName+" not found");
 
         }
