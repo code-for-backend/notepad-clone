@@ -1,2 +1,0 @@
-Hello my name is java-dev
-This is a text-editor project
