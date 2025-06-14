@@ -130,7 +130,7 @@ private void addEventListeners()
     loadMenuItem.addActionListener(event->loadFile());
     saveMenuItem.addActionListener(event->saveFile());
     searchButton.addActionListener(event->search());
-    previousButton.addActionListener(event->nextSearch());
+    previousButton.addActionListener(event->previousSearch());
     nextButton.addActionListener(event->nextSearch());
 
 }
@@ -266,6 +266,9 @@ private void addEventListeners()
     //also currentMatchPosition can be thought as currentWordNumber
     private void nextSearch()
     {
+        if(matchCount==0)//In case of no matches
+            return;
+
         try {
             String word = textField.getText();
             if(word.isEmpty())
@@ -281,7 +284,7 @@ private void addEventListeners()
                 yellowHighlights.set(currentMatchPosition,highlightPreviousWord);//update the highlight associated with the previous word
 
             }
-//for the first word there isnt any previous highlighted word
+//removes the yellow highlight and highlights the next word
             textArea.getHighlighter().removeHighlight(yellowHighlights.get(nextWordNumber));
             currentHighlight = textArea.getHighlighter().addHighlight(matchPositions.get(nextWordNumber), matchPositions.get(nextWordNumber) + word.length(), currentHighlightPainter);
             currentMatchPosition=nextWordNumber;
@@ -303,6 +306,38 @@ private void addEventListeners()
 
     private void previousSearch()
     {
+        if(matchCount==0)  //In case of zero matches
+            return;
+
+        try {
+            String word=textField.getText();
+            if(word.isEmpty())
+                return;
+
+            //this will be the word to be highlighted
+            int previousWordNumber=((currentMatchPosition==-1)||(currentMatchPosition==0))?matchPositions.size()-1:currentMatchPosition-1;
+            if(currentHighlight!=null)
+            {
+                //clear the current highlight
+                textArea.getHighlighter().removeHighlight(currentHighlight);
+                Object yellowHighlight=textArea.getHighlighter().addHighlight(matchPositions.get(currentMatchPosition),matchPositions.get(currentMatchPosition)+word
+                        .length(),highlightPainter);
+                yellowHighlights.set(currentMatchPosition,yellowHighlight);
+
+
+
+            }
+            textArea.getHighlighter().removeHighlight(yellowHighlights.get(previousWordNumber));
+            currentHighlight=textArea.getHighlighter().addHighlight(matchPositions.get(previousWordNumber),matchPositions.get(previousWordNumber)+
+                    word.length(),currentHighlightPainter);
+            currentMatchPosition=previousWordNumber;
+            textArea.setCaretPosition(matchPositions.get(previousWordNumber)+word.length()); //put caret after the highlighted previous word
+            textArea.requestFocusInWindow();
+
+        } catch (BadLocationException e) {
+            JOptionPane.showMessageDialog(this,"Some error occured!");
+
+        }
 
 
     }
